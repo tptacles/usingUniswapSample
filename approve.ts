@@ -1,5 +1,9 @@
 const Web3 = require('web3');
 
+const rpcURL = "https://canto.slingshot.finance";
+
+const web3 = new Web3(rpcURL);
+
 const TokenContractABI = [
     {
         "constant": true,

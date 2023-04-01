@@ -3,6 +3,7 @@ pragma solidity ^0.8.7;
 
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IERC20.sol";
+import "hardhat/console.sol";
 
 error TransferFormFailed();
 error AproveFailed();
@@ -14,6 +15,8 @@ error InvalidInput();
 contract SimpleSwap {
     IUniswapV2Router02 private immutable router; //using router 02
     address private immutable owner;
+    uint256 public balance;
+    uint[] public amountOut;
 
     constructor() {
         owner = msg.sender;
@@ -27,6 +30,12 @@ contract SimpleSwap {
         _;
     }
 
+    function sendFunds() public payable {
+        //(bool success, ) = address(this).call{value: msg.value}("");
+        //require(success, "transfer ETH failed");
+        balance = address(this).balance;
+    }
+
     function swapExactETHForTokens(
         uint256 _amountOutMin,
         address _tokenOut,
@@ -36,16 +45,14 @@ contract SimpleSwap {
         if (msg.value <= 0 || _amountOutMin <= 0 || _allowedTime <= 0) {
             revert InvalidInput();
         }
+        console.log("contract send value: ", msg.value);
         address[] memory _path = new address[](2);
         _path[0] = router.WETH();
         _path[1] = _tokenOut;
         unchecked {
-            router.swapExactETHForTokens{value: msg.value}(
-                _amountOutMin,
-                _path,
-                _to,
-                block.timestamp + _allowedTime
-            );
+            amountOut = router.swapExactETHForTokens{
+                value: address(this).balance
+            }(_amountOutMin, _path, _to, block.timestamp + _allowedTime);
         }
     }
 

@@ -15,8 +15,7 @@ error InvalidInput();
 contract SimpleSwap {
     IUniswapV2Router02 private immutable router; //using router 02
     address private immutable owner;
-    uint256 public balance;
-    uint[] public amountOut;
+    event transferCompleted(uint256 amountIn, uint256 amountOut);
 
     constructor() {
         owner = msg.sender;
@@ -28,12 +27,6 @@ contract SimpleSwap {
             revert NotOwner();
         }
         _;
-    }
-
-    function sendFunds() public payable {
-        //(bool success, ) = address(this).call{value: msg.value}("");
-        //require(success, "transfer ETH failed");
-        balance = address(this).balance;
     }
 
     function swapExactETHForTokens(
@@ -50,9 +43,12 @@ contract SimpleSwap {
         _path[0] = router.WETH();
         _path[1] = _tokenOut;
         unchecked {
-            amountOut = router.swapExactETHForTokens{
+            uint256[] memory amountOut = router.swapExactETHForTokens{
                 value: address(this).balance
             }(_amountOutMin, _path, _to, block.timestamp + _allowedTime);
+            console.log("Transfer amount In: ", amountOut[0]);
+            console.log("Transfer amount Out: ", amountOut[1]);
+            emit transferCompleted(amountOut[0], amountOut[1]);
         }
     }
 
@@ -64,30 +60,37 @@ contract SimpleSwap {
         address _to,
         uint256 _allowedTime
     ) external {
-        //require(IERC20(tokenIn_).transferFrom(msg.sender, address(this), amountIn_), "transferForm Failed");
-        //require(IERC20(tokenIn_).approve(address(router), amountIn_), "approve failed");
         if (_amountIn <= 0 || _amountOutMin <= 0 || _allowedTime <= 0) {
             revert InvalidInput();
         }
+        console.log("Token in: ", _tokenIn);
         if (
             !IERC20(_tokenIn).transferFrom(msg.sender, address(this), _amountIn)
         ) {
             revert TransferFormFailed();
         }
+        console.log("AmountIn transferred form: ", _amountIn);
+
         if (!IERC20(_tokenIn).approve(address(router), _amountIn)) {
             revert AproveFailed();
         }
-        address[] memory _path = new address[](2);
+        console.log("Router approved:---- ", _amountIn);
+        address[] memory _path = new address[](3);
         _path[0] = _tokenIn;
-        _path[1] = _tokenOut;
+        _path[1] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; //WETH address
+        _path[2] = _tokenOut;
         unchecked {
-            router.swapExactTokensForTokens(
+            uint256[] memory amountOut = router.swapExactTokensForTokens(
                 _amountIn,
                 _amountOutMin,
                 _path,
                 _to,
                 block.timestamp + _allowedTime
             );
+            console.log("Amount Token In0: ", amountOut[0]);
+            console.log("Amount Token Out1: ", amountOut[1]);
+            console.log("Amount Token out2: ", amountOut[2]);
+            emit transferCompleted(amountOut[0], amountOut[1]);
         }
     }
 

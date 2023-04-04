@@ -14,12 +14,25 @@ async function main() {
       gasLimit: 500000,
     }
   );
-  await transactionResponse.wait(1);
   console.log("transaction response: ", transactionResponse);
-  let amountOut = await simpleSwap.amountOut(0);
-  console.log("amount in0: ", amountOut.toString());
-  amountOut = await simpleSwap.amountOut(1);
-  console.log("amount out1: ", amountOut.toString());
+  const transactionReceipt = await transactionResponse.wait();
+  console.log(
+    "the index is :-----",
+    transactionReceipt.events.length,
+    transactionReceipt.events
+  );
+  console.log(
+    "amount In: ",
+    transactionReceipt.events[
+      transactionReceipt.events.length - 1
+    ].args.amountIn.toString()
+  );
+  console.log(
+    "amount Out: ",
+    transactionReceipt.events[
+      transactionReceipt.events.length - 1
+    ].args.amountOut.toString()
+  );
 }
 main()
   .then(() => process.exit(0))

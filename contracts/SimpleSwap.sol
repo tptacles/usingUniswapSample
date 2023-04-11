@@ -52,6 +52,7 @@ contract SimpleSwap {
         }
     }
 
+    //needs to approve this contract for token transfer before calling
     function swapExactTokensForTokens(
         address _tokenIn,
         address _tokenOut,
@@ -90,7 +91,7 @@ contract SimpleSwap {
             console.log("Amount Token In0: ", amountOut[0]);
             console.log("Amount Token Out1: ", amountOut[1]);
             console.log("Amount Token out2: ", amountOut[2]);
-            emit transferCompleted(amountOut[0], amountOut[1]);
+            emit transferCompleted(amountOut[0], amountOut[2]);
         }
     }
 

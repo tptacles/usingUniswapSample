@@ -1,3 +1,4 @@
+//script to deploy the contract without using hardhat-deploy
 const { ethers } = require("hardhat");
 async function main() {
   const SimpleSwapFactory = await ethers.getContractFactory("SimpleSwap");

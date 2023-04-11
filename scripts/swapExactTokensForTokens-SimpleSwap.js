@@ -1,5 +1,6 @@
 const { ethers } = require("hardhat");
 const SHIBA_MAINNET = process.env.SHIBA_MAINNET;
+const path = [];
 async function main() {
   const { deployer } = await getNamedAccounts();
   console.log("got named accounts: ", deployer);

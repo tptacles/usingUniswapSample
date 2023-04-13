@@ -6,7 +6,7 @@ typechain
 typechain-types
 deployments
 draft
-CurrentGasUsage.txt
+
 # Hardhat files
 cache
 artifacts

@@ -1,6 +1,8 @@
 # Sample Hardhat Project working with Uniswap
 
 This project demonstrates a basic Hardhat use case that forks to a mainnet and impersonates an account. Working with Uniswap to exchange tokens. It comes with test cases
+SimpleSwap.sol uses uniswap router to swap tokens
+PairsSwap.sol uses uniswap pair without the help of router
 
 ## Installation:
 

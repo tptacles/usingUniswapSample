@@ -1,23 +1,26 @@
 const { ethers } = require("hardhat");
-const SHIBA_MAINNET = process.env.SHIBA_MAINNET;
-const path = [];
+const path = [
+  process.env.SHIBA_MAINNET,
+  process.env.WETH_MAINNET,
+  process.env.EMAX_MAINNET,
+];
+const amountIn = ethers.utils.parseUnits("0.000001", 18);
+
 async function main() {
   const { deployer } = await getNamedAccounts();
   console.log("got named accounts: ", deployer);
-  const SHIBA = await ethers.getContractAt("IERC20", SHIBA_MAINNET, deployer);
+  const TOKEN = await ethers.getContractAt("IERC20", path[0], deployer);
   //const SHIBA = new ethers.Contract(SHIBA_MAINNET, SHIBA_ABI, provider);
-  console.log("IERC20 retrieved: ", await SHIBA.name());
+  console.log("IERC20 retrieved: ", await TOKEN.name());
 
   const simpleSwap = await ethers.getContract("SimpleSwap", deployer);
   console.log("simpleswap retrieved: ", simpleSwap.address);
-  const amountIn = 1000000000000;
-  await SHIBA.approve(simpleSwap.address, amountIn, {
+  await TOKEN.approve(simpleSwap.address, amountIn, {
     gasLimit: 500000,
   });
   console.log("SHIBA tranfer approved-----");
   const transactionResponse = await simpleSwap.swapExactTokensForTokens(
-    SHIBA_MAINNET,
-    process.env.EMAX_MAINNET,
+    path,
     amountIn,
     1,
     deployer,

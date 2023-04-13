@@ -47,15 +47,20 @@ contract SimpleSwap {
                 value: address(this).balance
             }(_amountOutMin, _path, _to, block.timestamp + _allowedTime);
             console.log("Transfer amount In: ", amountOut[0]);
-            console.log("Transfer amount Out: ", amountOut[1]);
-            emit transferCompleted(amountOut[0], amountOut[1]);
+            console.log(
+                "Transfer amount Out: ",
+                amountOut[amountOut.length - 1]
+            );
+            emit transferCompleted(
+                amountOut[0],
+                amountOut[amountOut.length - 1]
+            );
         }
     }
 
     //needs to approve this contract for token transfer before calling
     function swapExactTokensForTokens(
-        address _tokenIn,
-        address _tokenOut,
+        address[] calldata _path,
         uint256 _amountIn,
         uint256 _amountOutMin,
         address _to,
@@ -64,22 +69,18 @@ contract SimpleSwap {
         if (_amountIn <= 0 || _amountOutMin <= 0 || _allowedTime <= 0) {
             revert InvalidInput();
         }
-        console.log("Token in: ", _tokenIn);
+        console.log("Token in: %s msg.sender: %s", _path[0], msg.sender);
         if (
-            !IERC20(_tokenIn).transferFrom(msg.sender, address(this), _amountIn)
+            !IERC20(_path[0]).transferFrom(msg.sender, address(this), _amountIn)
         ) {
             revert TransferFormFailed();
         }
         console.log("AmountIn transferred form: ", _amountIn);
 
-        if (!IERC20(_tokenIn).approve(address(router), _amountIn)) {
+        if (!IERC20(_path[0]).approve(address(router), _amountIn)) {
             revert AproveFailed();
         }
         console.log("Router approved:---- ", _amountIn);
-        address[] memory _path = new address[](3);
-        _path[0] = _tokenIn;
-        _path[1] = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; //WETH address
-        _path[2] = _tokenOut;
         unchecked {
             uint256[] memory amountOut = router.swapExactTokensForTokens(
                 _amountIn,
@@ -88,10 +89,12 @@ contract SimpleSwap {
                 _to,
                 block.timestamp + _allowedTime
             );
-            console.log("Amount Token In0: ", amountOut[0]);
-            console.log("Amount Token Out1: ", amountOut[1]);
-            console.log("Amount Token out2: ", amountOut[2]);
-            emit transferCompleted(amountOut[0], amountOut[2]);
+            console.log("Amount Token In: ", amountOut[0]);
+            console.log("Amount Token out: ", amountOut[amountOut.length - 1]);
+            emit transferCompleted(
+                amountOut[0],
+                amountOut[amountOut.length - 1]
+            );
         }
     }
 

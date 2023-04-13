@@ -6,4 +6,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 };
-module.exports.tags = ["All", "Router"];
+module.exports.tags = ["all", "router"];

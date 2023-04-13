@@ -5,6 +5,8 @@ import "@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol";
 import "hardhat/console.sol";
 
 contract PairsSwap {
+    event transferCompleted(uint256 amountIn, uint256 amountOut);
+
     function getPair(
         address _factory,
         address _token1,
@@ -67,5 +69,6 @@ contract PairsSwap {
             new bytes(0)
         );
         console.log("final balance: %s", IERC20(_tokenOut).balanceOf(_to));
+        emit transferCompleted(_amountIn, amounts[1]);
     }
 }
